@@ -1,0 +1,10 @@
+[Unit]
+Description=Run High Load Monitor Service every 25 seconds
+
+[Timer]
+OnActiveSec=25s
+OnUnitActiveSec=25s
+Unit=high-load.service
+
+[Install]
+WantedBy=timers.target

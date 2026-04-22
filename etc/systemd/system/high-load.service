@@ -1,0 +1,12 @@
+[Unit]
+Description=High Load Monitor Service
+After=network-online.target monitoring-validator.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/run/bash-sys-monitor/config
+ExecStart=/opt/monitoring/high-load.sh --threshold 4.0
+
+[Install]
+WantedBy=multi-user.target

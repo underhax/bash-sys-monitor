@@ -1,0 +1,9 @@
+[Unit]
+Description=Trigger Login Monitor Service on wtmp changes
+
+[Path]
+PathModified=/var/log/wtmp
+Unit=login-monitor.service
+
+[Install]
+WantedBy=multi-user.target

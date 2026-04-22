@@ -1,0 +1,11 @@
+[Unit]
+Description=Validate Monitoring Config
+Before=high-load.service login-monitor.service
+
+[Service]
+Type=oneshot
+ExecStart=/opt/monitoring/lib/validation.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

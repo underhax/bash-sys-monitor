@@ -1,0 +1,8 @@
+[Unit]
+Description=Login Monitor Service
+After=network-online.target monitoring-validator.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/monitoring/login.sh

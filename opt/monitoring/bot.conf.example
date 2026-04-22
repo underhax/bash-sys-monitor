@@ -1,0 +1,12 @@
+SERVER_NAME="my-server-01"
+
+BOT_TOKEN="000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+CHAT_ID="-1001234567890"
+
+MATRIX_URL="https://matrix.example.com"
+MATRIX_ROOM_ID="!exampleRoomId:example.com"
+MATRIX_ACCESS_TOKEN="syt_example_access_token_here"
+
+NTFY_URL="https://ntfy.sh"
+NTFY_TOPIC="my_secret_server_alerts"
+NTFY_TOKEN="tk_example_access_token_here"
