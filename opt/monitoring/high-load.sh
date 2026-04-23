@@ -255,7 +255,7 @@ collect_top_procs() {
 
 should_alert() {
   local load_exceeded
-  load_exceeded=$(echo "${LOAD_1} > ${THRESHOLD}" | bc -l)
+  load_exceeded=$(awk -v l="${LOAD_1}" -v t="${THRESHOLD}" 'BEGIN {print (l > t) ? 1 : 0}')
   [[ ${load_exceeded} -eq 1 ]] || return 1
 
   if [[ ${PSI_AVAILABLE} -eq 1 ]]; then
@@ -353,15 +353,15 @@ dispatch_notifications() {
       telegram)
         local message
         message=$(high_load_message_telegram)
-        tg_send_message "${message}" || echo "ERROR: telegram notification failed" >&2
-        tg_send_file "${TOP_PROCS_FILE}" || echo "ERROR: telegram file send failed" >&2
+        tg_send_message "${message}" || printf "ERROR: telegram notification failed\n" >&2
+        tg_send_file "${TOP_PROCS_FILE}" || printf "ERROR: telegram file send failed\n" >&2
         ;;
       matrix)
         local plain html
         plain=$(high_load_message_matrix_plain)
         html=$(high_load_message_matrix_html)
-        mx_send_message "${plain}" "${html}" || echo "ERROR: matrix notification failed" >&2
-        mx_send_file "${TOP_PROCS_FILE}" || echo "ERROR: matrix file send failed" >&2
+        mx_send_message "${plain}" "${html}" || printf "ERROR: matrix notification failed\n" >&2
+        mx_send_file "${TOP_PROCS_FILE}" || printf "ERROR: matrix file send failed\n" >&2
         ;;
       ntfy)
         local message title
@@ -369,11 +369,11 @@ dispatch_notifications() {
         title=$(high_load_title_ntfy)
         # shellcheck disable=SC2154
         # Rationale: NTFY_TOKEN is populated from config file.
-        ntfy_send "${message}" "${NTFY_URL}" "${NTFY_TOPIC}" "${NTFY_TOKEN}" "${title}" || echo "ERROR: ntfy notification failed" >&2
-        ntfy_send_file "${TOP_PROCS_FILE}" "${NTFY_URL}" "${NTFY_TOPIC}" "${NTFY_TOKEN}" "${title}" || echo "ERROR: ntfy file send failed" >&2
+        ntfy_send "${message}" "${NTFY_URL}" "${NTFY_TOPIC}" "${NTFY_TOKEN}" "${title}" || printf "ERROR: ntfy notification failed\n" >&2
+        ntfy_send_file "${TOP_PROCS_FILE}" "${NTFY_URL}" "${NTFY_TOPIC}" "${NTFY_TOKEN}" "${title}" || printf "ERROR: ntfy file send failed\n" >&2
         ;;
       *)
-        echo "ERROR: Unknown notifier: ${notifier}" >&2
+        printf "ERROR: Unknown notifier: %s\n" "${notifier}" >&2
         ;;
       esac
     ) &
@@ -384,7 +384,7 @@ dispatch_notifications() {
 
 main() {
   parse_args "$@"
-  check_deps awk bc curl jq ps file stat
+  check_deps awk curl jq ps file stat
 
   if [[ -z ${SERVER_NAME:-} ]] && [[ -f ${CONFIG_CACHE} ]]; then
     # shellcheck source=/dev/null

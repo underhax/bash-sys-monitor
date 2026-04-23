@@ -14,6 +14,7 @@ teardown_file() {
 setup() {
   export SCRIPT_DIR="${BATS_TEST_DIRNAME}/../opt/monitoring"
   export SENDERS_DIR="${SCRIPT_DIR}/senders"
+  source "${SCRIPT_DIR}/lib/common.sh"
   source "${SENDERS_DIR}/telegram.sh"
   source "${SENDERS_DIR}/matrix.sh"
   source "${SENDERS_DIR}/ntfy.sh"

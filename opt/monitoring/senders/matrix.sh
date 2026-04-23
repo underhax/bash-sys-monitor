@@ -16,7 +16,9 @@ mx_send_message() {
   local txn_id
   txn_id=$(mx_txn_id)
 
-  local endpoint="${url}/_matrix/client/v3/rooms/${room_id}/send/m.room.message/${txn_id}"
+  local encoded_room
+  encoded_room=$(urlencode "${room_id}")
+  local endpoint="${url}/_matrix/client/v3/rooms/${encoded_room}/send/m.room.message/${txn_id}"
 
   local payload
   payload=$(jq -n \
@@ -63,8 +65,9 @@ mx_upload_file() {
   local mime_type
   mime_type=$(file -b --mime-type "${file_path}")
 
-  local filename
+  local filename encoded_filename
   filename=$(basename "${file_path}")
+  encoded_filename=$(urlencode "${filename}")
 
   local upload_response content_uri
   upload_response=$(curl -fsSL \
@@ -76,7 +79,7 @@ mx_upload_file() {
     -H "Authorization: Bearer ${access_token}" \
     -H "Content-Type: ${mime_type}" \
     --data-binary "@${file_path}" \
-    "${url}/_matrix/media/v3/upload?filename=${filename}") || {
+    "${url}/_matrix/media/v3/upload?filename=${encoded_filename}") || {
     printf "ERROR [matrix]: File upload curl failed\n" >&2
     return 1
   }
@@ -104,7 +107,9 @@ mx_send_file() {
   filename=$(basename "${file_path}")
   txn_id=$(mx_txn_id)
 
-  local endpoint="${url}/_matrix/client/v3/rooms/${room_id}/send/m.room.message/${txn_id}"
+  local encoded_room
+  encoded_room=$(urlencode "${room_id}")
+  local endpoint="${url}/_matrix/client/v3/rooms/${encoded_room}/send/m.room.message/${txn_id}"
 
   local payload
   payload=$(jq -n \

@@ -24,10 +24,9 @@ validate_bot_config() {
   # Rationale: Configuration file path is resolved dynamically at runtime.
   source "${config_file}"
 
-  [[ -n ${SERVER_NAME:-} ]] || {
-    printf "SERVER_NAME is not set\n" >&2
-    return 1
-  }
+  # shellcheck disable=SC2310
+  # Rationale: Function intentionally returns error code for parent script to handle.
+  validate_server_name "${SERVER_NAME:-}" || return 1
 
   local has_telegram=0
   local has_matrix=0
@@ -347,6 +346,19 @@ validate_matrix_room_id() {
     }
   fi
 
+  return 0
+}
+
+validate_server_name() {
+  local val="$1"
+  [[ -n ${val} ]] || {
+    printf "SERVER_NAME is not set\n" >&2
+    return 1
+  }
+  [[ ${val} =~ ^[a-zA-Z0-9\ ._-]+$ ]] || {
+    printf "SERVER_NAME format is invalid (allowed: a-z, A-Z, 0-9, space, ., _, -)\n" >&2
+    return 1
+  }
   return 0
 }
 

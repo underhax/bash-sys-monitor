@@ -487,6 +487,36 @@ teardown_file() {
   [ "$status" -eq 1 ]
 }
 
+@test "validate_server_name accepts valid names" {
+  run validate_server_name "my-server-01"
+  [ "$status" -eq 0 ]
+  run validate_server_name "prod.web.us-east"
+  [ "$status" -eq 0 ]
+  run validate_server_name "Server_Name.123"
+  [ "$status" -eq 0 ]
+  run validate_server_name "server name"
+  [ "$status" -eq 0 ]
+}
+
+@test "validate_server_name rejects empty name" {
+  run validate_server_name ""
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"SERVER_NAME is not set"* ]]
+}
+
+@test "validate_server_name rejects CRLF injection" {
+  run validate_server_name $'server\r\nX-Injected: true'
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"SERVER_NAME format is invalid"* ]]
+}
+
+@test "validate_server_name rejects special chars" {
+  run validate_server_name "server/../../etc"
+  [ "$status" -eq 1 ]
+  run validate_server_name 'server$(whoami)'
+  [ "$status" -eq 1 ]
+}
+
 @test "validate_ntfy_topic accepts valid topic" {
   run validate_ntfy_topic "my-topic"
   [ "$status" -eq 0 ]

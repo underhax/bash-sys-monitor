@@ -172,7 +172,7 @@ setup() {
     if [[ "$1" == "-v" ]]; then return 0; fi
     builtin command "$@"
   }
-  run check_deps awk bc curl jq ps file stat
+  run check_deps awk curl jq ps file stat
   [ "$status" -eq 1 ]
   [[ "$output" == *"Missing required commands: awk"* ]]
 }
@@ -278,19 +278,19 @@ setup() {
   [ -z "$FAILED_SERVICES" ]
 }
 
-@test "main calls check_deps with awk bc curl jq ps file stat" {
+@test "main calls check_deps with awk curl jq ps file stat" {
   check_deps() { printf "DEPS_CALLED:%s\n" "$*"; }
 
   run main --threshold 5.0
-  [[ "$output" == *"DEPS_CALLED:awk bc curl jq ps file stat"* ]]
+  [[ "$output" == *"DEPS_CALLED:awk curl jq ps file stat"* ]]
 }
 
 @test "main fails when check_deps reports missing commands" {
-  check_deps() { die "Missing required commands: bc"; }
+  check_deps() { die "Missing required commands: jq"; }
 
   run main --threshold 5.0
   [ "$status" -eq 1 ]
-  [[ "$output" == *"Missing required commands: bc"* ]]
+  [[ "$output" == *"Missing required commands: jq"* ]]
 }
 
 @test "main fails without --threshold" {

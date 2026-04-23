@@ -121,13 +121,13 @@ dispatch_login_notification() {
       telegram)
         local message
         message=$(login_message_telegram)
-        tg_send_message "${message}" || echo "ERROR: telegram notification failed" >&2
+        tg_send_message "${message}" || printf "ERROR: telegram notification failed\n" >&2
         ;;
       matrix)
         local plain html
         plain=$(login_message_matrix_plain)
         html=$(login_message_matrix_html)
-        mx_send_message "${plain}" "${html}" || echo "ERROR: matrix notification failed" >&2
+        mx_send_message "${plain}" "${html}" || printf "ERROR: matrix notification failed\n" >&2
         ;;
       ntfy)
         local message title
@@ -135,10 +135,10 @@ dispatch_login_notification() {
         title=$(login_title_ntfy)
         # shellcheck disable=SC2154
         # Rationale: NTFY_* variables are populated from config file at runtime
-        ntfy_send "${message}" "${NTFY_URL}" "${NTFY_TOPIC}" "${NTFY_TOKEN}" "${title}" || echo "ERROR: ntfy notification failed" >&2
+        ntfy_send "${message}" "${NTFY_URL}" "${NTFY_TOPIC}" "${NTFY_TOKEN}" "${title}" || printf "ERROR: ntfy notification failed\n" >&2
         ;;
       *)
-        echo "ERROR: Unknown notifier: ${notifier}" >&2
+        printf "ERROR: Unknown notifier: %s\n" "${notifier}" >&2
         ;;
       esac
     ) &

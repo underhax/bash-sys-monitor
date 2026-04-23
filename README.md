@@ -46,7 +46,7 @@ The login monitor focuses on immediate visibility into system access. It monitor
 ### 2. Dependencies
 Install the necessary utilities using the package manager:
 ```bash
-sudo apt update && sudo apt install -y awk bc curl jq procps coreutils file
+sudo apt update && sudo apt install -y awk curl jq procps coreutils file
 ```
 
 ## Installation
