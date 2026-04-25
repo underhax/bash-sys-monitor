@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+    branches: ["*"]
+
+jobs:
+  shell-quality:
+    name: Shell Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Install shellcheck
+        uses: ludeeus/action-shellcheck@00cae500b08a931fb5698e11e79bfbd38e612a38 # v2.0.0
+        with:
+          ignore_paths: >-
+            **/.git/**
+            **/.github/**
+
+      - name: Install shfmt and bats
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shfmt bats
+
+      - name: Find all shell scripts
+        id: find-scripts
+        run: |
+          scripts=$(find opt/monitoring -name "*.sh" -type f | tr '\n' ' ')
+          echo "scripts=${scripts}" >> $GITHUB_OUTPUT
+          echo "Found scripts: ${scripts}"
+
+      - name: Check formatting with shfmt
+        run: |
+          scripts="${{ steps.find-scripts.outputs.scripts }}"
+          if [ -n "${scripts}" ]; then
+            shfmt -d -s -i 2 ${scripts}
+          else
+            echo "No shell scripts found to check"
+          fi
+
+      - name: Run shellcheck
+        run: |
+          scripts="${{ steps.find-scripts.outputs.scripts }}"
+          if [ -n "${scripts}" ]; then
+            shellcheck --enable=all -x ${scripts}
+          else
+            echo "No shell scripts found to lint"
+          fi
+
+      - name: Run BATS tests
+        run: |
+          if [ -d "tests" ] && [ "$(find tests -name '*.bats' -type f | wc -l)" -gt 0 ]; then
+            bats tests/
+          else
+            echo "No BATS tests found to run"
+          fi

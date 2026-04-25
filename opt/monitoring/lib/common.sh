@@ -10,7 +10,9 @@ info() {
 }
 
 debug() {
-  [[ ${VERBOSE:-0} -eq 1 ]] && printf "DEBUG: %s\n" "$*" >&2 || true
+  if [[ ${VERBOSE:-0} -eq 1 ]]; then
+    printf "DEBUG: %s\n" "$*" >&2
+  fi
 }
 
 check_deps() {

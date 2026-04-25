@@ -378,15 +378,16 @@ setup() {
     esac
   }
 
-  process_logins
-
   stat() {
     if [[ "$1" == "-c" && "$2" == "%a" ]]; then
-      command stat -f "%Lp" "$3"
+      printf "600\n"
     else
       command stat "$@"
     fi
   }
+
+  process_logins
+
   local perms
   perms=$(stat -c "%a" "${STATE_FILE}")
   [ "$perms" = "600" ]

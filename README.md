@@ -1,5 +1,11 @@
 # bash-sys-monitor
 
+[![ShellCheck Lint](https://github.com/underhax/bash-sys-monitor/actions/workflows/ci.yml/badge.svg)](https://github.com/underhax/bash-sys-monitor/actions/workflows/ci.yml)
+[![GitHub last commit](https://img.shields.io/github/last-commit/underhax/bash-sys-monitor)](https://github.com/underhax/bash-sys-monitor/commits/main)
+[![GitHub issues](https://img.shields.io/github/issues/underhax/bash-sys-monitor)](https://github.com/underhax/bash-sys-monitor/issues)
+[![GitHub repo size](https://img.shields.io/github/repo-size/underhax/bash-sys-monitor)](https://github.com/underhax/bash-sys-monitor)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 **bash-sys-monitor** is a lightweight, security-hardened, and modular suite of shell scripts designed for high-availability monitoring of Ubuntu Server 24+ (and compatible Linux distributions). It provides real-time system performance monitoring and security auditing with multi-channel alerting.
 
 ## Overview
