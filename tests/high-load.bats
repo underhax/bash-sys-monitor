@@ -245,13 +245,38 @@ setup() {
 }
 
 @test "collect_top_procs creates temp file with process data" {
-  mktemp() { command mktemp "${TEST_TMPDIR}/high-load-top-XXXXXX.txt"; }
-  ps() {
-    echo "USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND"
-    echo "root         1  0.1  0.0  12345  6789 ?        Ss   00:00   0:01 /sbin/init"
-    echo "www-data   100 95.0  2.5 987654 65432 ?        R    00:01   5:30 /usr/sbin/apache2"
+  local mock_top_file="${TEST_TMPDIR}/mock_top_procs.txt"
+  local mock_raw_file="${TEST_TMPDIR}/mock_top_raw.txt"
+
+  mktemp() {
+    case "$1" in
+    *raw*) printf '%s' "${mock_raw_file}" ;;
+    *) printf '%s' "${mock_top_file}" ;;
+    esac
   }
-  head() { command head "$@"; }
+
+  top() {
+    printf '%s\n' \
+      'top - 12:00:00 up 1 day,  1:00,  0 users,  load average: 4.50, 4.00, 3.50' \
+      'Tasks: 100 total,   1 running,  99 sleeping,   0 stopped,   0 zombie' \
+      '%Cpu(s): 50.0 us, 10.0 sy,  0.0 ni, 40.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st' \
+      'MiB Mem :   8192.0 total,   2048.0 free,   4096.0 used,   2048.0 buff/cache' \
+      'MiB Swap:   2048.0 total,   2048.0 free,      0.0 used.   6000.0 avail Mem' \
+      '' \
+      'PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND' \
+      '  1 root      20   0   25132  14760   9156 S   0.0   0.1  20:30.11 /sbin/init' \
+      '100 www-data  20   0  987654  65432  12345 R  95.0   2.5   5:30.00 /usr/sbin/apache2' \
+      '' \
+      'top - 12:00:01 up 1 day,  1:01,  0 users,  load average: 4.45, 4.00, 3.50' \
+      'Tasks: 100 total,   1 running,  99 sleeping,   0 stopped,   0 zombie' \
+      '%Cpu(s): 50.0 us, 10.0 sy,  0.0 ni, 40.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st' \
+      'MiB Mem :   8192.0 total,   2048.0 free,   4096.0 used,   2048.0 buff/cache' \
+      'MiB Swap:   2048.0 total,   2048.0 free,      0.0 used.   6000.0 avail Mem' \
+      '' \
+      'PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND' \
+      '  1 root      20   0   25132  14760   9156 S   0.0   0.1  20:30.11 /sbin/init' \
+      '100 www-data  20   0  987654  65432  12345 R  95.0   2.5   5:30.00 /usr/sbin/apache2'
+  }
 
   collect_top_procs
   [ -f "${TOP_PROCS_FILE}" ]

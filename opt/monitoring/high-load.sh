@@ -249,7 +249,14 @@ collect_top_procs() {
   TOP_PROCS_FILE=$(mktemp /run/bash-sys-monitor/high-load-top-XXXXXX.txt)
   trap 'rm -f "${TOP_PROCS_FILE}"' EXIT
 
-  LC_ALL=C ps aux --sort=-%cpu | head -n $((TOP_PROCS_COUNT + 1)) >"${TOP_PROCS_FILE}"
+  local raw_file
+  raw_file=$(mktemp /run/bash-sys-monitor/high-load-top-raw-XXXXXX.txt)
+
+  LC_ALL=C top -b -n 2 -d 1 -c -o +%CPU -w 160 >"${raw_file}" 2>/dev/null || true
+
+  awk -v c="${TOP_PROCS_COUNT}" '/PID USER/ { m++; if (m == 2) { print; p=0; while(p < c && getline > 0) { if ($0 !~ /top -b -n 2/ && NF > 0) { print; p++ } } exit } }' "${raw_file}" >"${TOP_PROCS_FILE}" || true
+
+  rm -f "${raw_file}"
   debug "Top processes written to ${TOP_PROCS_FILE}"
 }
 
