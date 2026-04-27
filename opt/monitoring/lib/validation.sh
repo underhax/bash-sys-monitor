@@ -355,8 +355,8 @@ validate_server_name() {
     printf "SERVER_NAME is not set\n" >&2
     return 1
   }
-  [[ ${val} =~ ^[a-zA-Z0-9\ ._-]+$ ]] || {
-    printf "SERVER_NAME format is invalid (allowed: a-z, A-Z, 0-9, space, ., _, -)\n" >&2
+  [[ ${val} =~ ^[a-zA-Z0-9\ ._+-]+$ ]] || {
+    printf "SERVER_NAME format is invalid (allowed: a-z, A-Z, 0-9, space, ., _, -, +)\n" >&2
     return 1
   }
   return 0

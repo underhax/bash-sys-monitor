@@ -22,31 +22,31 @@ setup() {
 @test "common: die prints ERROR to stderr and exits 1" {
   run die "something broke"
   [ "$status" -eq 1 ]
-  [[ "$output" == *"ERROR: something broke"* ]]
+  [[ $output == *"ERROR: something broke"* ]]
 }
 
 @test "common: die handles multiple arguments" {
   run die "disk full" "on /dev/sda1"
   [ "$status" -eq 1 ]
-  [[ "$output" == *"ERROR: disk full on /dev/sda1"* ]]
+  [[ $output == *"ERROR: disk full on /dev/sda1"* ]]
 }
 
 @test "common: die handles empty message" {
   run die
   [ "$status" -eq 1 ]
-  [[ "$output" == *"ERROR:"* ]]
+  [[ $output == *"ERROR:"* ]]
 }
 
 @test "common: info prints INFO to stderr" {
   run info "startup complete"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"INFO:  startup complete"* ]]
+  [[ $output == *"INFO:  startup complete"* ]]
 }
 
 @test "common: info handles multiple arguments" {
   run info "loaded" "5 modules"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"INFO:  loaded 5 modules"* ]]
+  [[ $output == *"INFO:  loaded 5 modules"* ]]
 }
 
 @test "common: debug is silent when VERBOSE=0" {
@@ -69,7 +69,7 @@ setup() {
   VERBOSE=1
   run debug "trace message"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"DEBUG: trace message"* ]]
+  [[ $output == *"DEBUG: trace message"* ]]
 }
 
 @test "common: check_deps succeeds with no arguments" {
@@ -79,7 +79,7 @@ setup() {
 
 @test "common: check_deps succeeds when all commands exist" {
   command() {
-    if [[ "$1" == "-v" ]]; then return 0; fi
+    if [[ $1 == "-v" ]]; then return 0; fi
     builtin command "$@"
   }
   run check_deps bash cat ls
@@ -88,25 +88,25 @@ setup() {
 
 @test "common: check_deps fails with single missing command" {
   command() {
-    if [[ "$1" == "-v" && "$2" == "nonexistent_cmd" ]]; then return 1; fi
-    if [[ "$1" == "-v" ]]; then return 0; fi
+    if [[ $1 == "-v" && $2 == "nonexistent_cmd" ]]; then return 1; fi
+    if [[ $1 == "-v" ]]; then return 0; fi
     builtin command "$@"
   }
   run check_deps bash nonexistent_cmd
   [ "$status" -eq 1 ]
-  [[ "$output" == *"Missing required commands: nonexistent_cmd"* ]]
+  [[ $output == *"Missing required commands: nonexistent_cmd"* ]]
 }
 
 @test "common: check_deps reports multiple missing commands" {
   command() {
-    if [[ "$1" == "-v" && ("$2" == "foo" || "$2" == "bar") ]]; then return 1; fi
-    if [[ "$1" == "-v" ]]; then return 0; fi
+    if [[ $1 == "-v" && ($2 == "foo" || $2 == "bar") ]]; then return 1; fi
+    if [[ $1 == "-v" ]]; then return 0; fi
     builtin command "$@"
   }
   run check_deps foo bar
   [ "$status" -eq 1 ]
-  [[ "$output" == *"foo"* ]]
-  [[ "$output" == *"bar"* ]]
+  [[ $output == *"foo"* ]]
+  [[ $output == *"bar"* ]]
 }
 
 @test "common: load_senders sources sender modules" {
@@ -162,25 +162,25 @@ setup() {
 @test "common: get_available_notifiers without prefix returns all notifiers" {
   run get_available_notifiers
   [ "$status" -eq 0 ]
-  [[ "$output" == *"telegram"* ]]
-  [[ "$output" == *"matrix"* ]]
-  [[ "$output" == *"ntfy"* ]]
+  [[ $output == *"telegram"* ]]
+  [[ $output == *"matrix"* ]]
+  [[ $output == *"ntfy"* ]]
 }
 
 @test "common: get_available_notifiers with login- prefix returns login notifiers" {
   run get_available_notifiers "login-"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"telegram"* ]]
-  [[ "$output" == *"matrix"* ]]
-  [[ "$output" == *"ntfy"* ]]
+  [[ $output == *"telegram"* ]]
+  [[ $output == *"matrix"* ]]
+  [[ $output == *"ntfy"* ]]
 }
 
 @test "common: get_available_notifiers with high-load- prefix returns high-load notifiers" {
   run get_available_notifiers "high-load-"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"telegram"* ]]
-  [[ "$output" == *"matrix"* ]]
-  [[ "$output" == *"ntfy"* ]]
+  [[ $output == *"telegram"* ]]
+  [[ $output == *"matrix"* ]]
+  [[ $output == *"ntfy"* ]]
 }
 
 @test "common: get_available_notifiers with nonexistent prefix returns empty" {
@@ -192,20 +192,20 @@ setup() {
 @test "common: get_configured_notifiers returns telegram when BOT_TOKEN set" {
   BOT_TOKEN="000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
   run get_configured_notifiers
-  [[ "$output" == *"telegram"* ]]
+  [[ $output == *"telegram"* ]]
 }
 
 @test "common: get_configured_notifiers returns matrix when MATRIX_URL set" {
   MATRIX_URL="https://matrix.example.com"
   run get_configured_notifiers
-  [[ "$output" == *"matrix"* ]]
+  [[ $output == *"matrix"* ]]
 }
 
 @test "common: get_configured_notifiers returns ntfy when NTFY_URL set" {
   NTFY_URL="https://ntfy.sh"
   NTFY_TOPIC="test"
   run get_configured_notifiers
-  [[ "$output" == *"ntfy"* ]]
+  [[ $output == *"ntfy"* ]]
 }
 
 @test "common: get_configured_notifiers returns all when all configured" {
@@ -214,9 +214,9 @@ setup() {
   NTFY_URL="https://ntfy.sh"
   NTFY_TOPIC="test"
   run get_configured_notifiers
-  [[ "$output" == *"telegram"* ]]
-  [[ "$output" == *"matrix"* ]]
-  [[ "$output" == *"ntfy"* ]]
+  [[ $output == *"telegram"* ]]
+  [[ $output == *"matrix"* ]]
+  [[ $output == *"ntfy"* ]]
 }
 
 @test "common: get_configured_notifiers returns empty when nothing set" {

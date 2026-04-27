@@ -32,15 +32,15 @@ setup() {
 @test "login: parse_args shows help and exits" {
   run parse_args --help
   [ "$status" -eq 0 ]
-  [[ "$output" == *"Usage: login.sh"* ]]
-  [[ "$output" == *"--notifiers"* ]]
+  [[ $output == *"Usage: login.sh"* ]]
+  [[ $output == *"--notifiers"* ]]
 }
 
 @test "login: parse_args dies on unknown argument" {
   run parse_args --invalid-flag
   [ "$status" -eq 1 ]
-  [[ "$output" == *"ERROR:"* ]]
-  [[ "$output" == *"Unknown argument"* ]]
+  [[ $output == *"ERROR:"* ]]
+  [[ $output == *"Unknown argument"* ]]
 }
 
 @test "login: parse_args dies when --notifiers has no value" {
@@ -66,10 +66,10 @@ setup() {
 @test "login: usage contains Options and Example sections" {
   run usage
   [ "$status" -eq 0 ]
-  [[ "$output" == *"Options:"* ]]
-  [[ "$output" == *"Example:"* ]]
-  [[ "$output" == *"--help"* ]]
-  [[ "$output" == *"telegram, matrix, ntfy"* ]]
+  [[ $output == *"Options:"* ]]
+  [[ $output == *"Example:"* ]]
+  [[ $output == *"--help"* ]]
+  [[ $output == *"telegram, matrix, ntfy"* ]]
 }
 
 @test "login: dispatch_login_notification exports login env variables" {
@@ -114,7 +114,10 @@ setup() {
   CHAT_ID="-123456789"
   REQUESTED_NOTIFIERS="telegram"
 
-  tg_send_message() { echo "MOCK_TG_SEND"; return 0; }
+  tg_send_message() {
+    echo "MOCK_TG_SEND"
+    return 0
+  }
 
   run dispatch_login_notification "admin" "pts/0" "192.168.1.100" "2026-04-23 00:55:00"
   [ "$status" -eq 0 ]
@@ -130,7 +133,10 @@ setup() {
   MATRIX_ACCESS_TOKEN="syt_abcdefghijklmnopqrstuvwxyz123456"
   REQUESTED_NOTIFIERS="matrix"
 
-  mx_send_message() { echo "MOCK_MX_SEND"; return 0; }
+  mx_send_message() {
+    echo "MOCK_MX_SEND"
+    return 0
+  }
 
   run dispatch_login_notification "admin" "pts/1" "10.0.0.5" "2026-04-23 00:55:00"
   [ "$status" -eq 0 ]
@@ -146,7 +152,10 @@ setup() {
   NTFY_TOKEN="tk_abcdef123456"
   REQUESTED_NOTIFIERS="ntfy"
 
-  ntfy_send() { echo "MOCK_NTFY_SEND"; return 0; }
+  ntfy_send() {
+    echo "MOCK_NTFY_SEND"
+    return 0
+  }
 
   run dispatch_login_notification "root" "pts/2" "172.16.0.1" "2026-04-23 00:55:00"
   [ "$status" -eq 0 ]
@@ -191,8 +200,14 @@ setup() {
   MATRIX_ACCESS_TOKEN="syt_abcdefghijklmnopqrstuvwxyz123456"
   REQUESTED_NOTIFIERS=""
 
-  tg_send_message() { echo "MOCK_TG"; return 0; }
-  mx_send_message() { echo "MOCK_MX"; return 0; }
+  tg_send_message() {
+    echo "MOCK_TG"
+    return 0
+  }
+  mx_send_message() {
+    echo "MOCK_MX"
+    return 0
+  }
 
   run dispatch_login_notification "admin" "pts/0" "10.0.0.1" "2026-04-23 00:55:00"
   [ "$status" -eq 0 ]
@@ -209,7 +224,7 @@ setup() {
   run process_logins
   [ "$status" -eq 0 ]
   [ -f "${STATE_FILE}" ]
-  [[ "$output" == *"First run"* ]]
+  [[ $output == *"First run"* ]]
 
   local content
   content=$(<"${STATE_FILE}")
@@ -273,16 +288,16 @@ setup() {
   }
 
   date() {
-    if [[ "$1" == "-d" ]]; then
+    if [[ $1 == "-d" ]]; then
       shift
-      if [[ "$1" == +'%Y-%m-%d %H:%M:%S' ]]; then
+      if [[ $1 == +'%Y-%m-%d %H:%M:%S' ]]; then
         echo "2026-04-23 01:30:00"
       else
         echo "1713831000"
       fi
-    elif [[ "$1" == "+%s" ]]; then
+    elif [[ $1 == "+%s" ]]; then
       echo "1713830400"
-    elif [[ "$1" == +'%Y-%m-%d %H:%M:%S' ]]; then
+    elif [[ $1 == +'%Y-%m-%d %H:%M:%S' ]]; then
       echo "2026-04-23 01:30:00"
     else
       echo "1713831000"
@@ -293,7 +308,7 @@ setup() {
 
   run process_logins
   [ "$status" -eq 0 ]
-  [[ "$output" == *"New login detected"* ]]
+  [[ $output == *"New login detected"* ]]
 }
 
 @test "login: process_logins replaces 0.0.0.0 IP with Local" {
@@ -308,16 +323,16 @@ setup() {
   }
 
   date() {
-    if [[ "$1" == "-d" ]]; then
+    if [[ $1 == "-d" ]]; then
       shift
-      if [[ "$1" == +'%Y-%m-%d %H:%M:%S' ]]; then
+      if [[ $1 == +'%Y-%m-%d %H:%M:%S' ]]; then
         echo "2026-04-23 01:30:00"
       else
         echo "1713831000"
       fi
-    elif [[ "$1" == "+%s" ]]; then
+    elif [[ $1 == "+%s" ]]; then
       echo "1713830400"
-    elif [[ "$1" == +'%Y-%m-%d %H:%M:%S' ]]; then
+    elif [[ $1 == +'%Y-%m-%d %H:%M:%S' ]]; then
       echo "2026-04-23 01:30:00"
     else
       echo "1713831000"
@@ -330,7 +345,7 @@ setup() {
 
   run process_logins
   [ "$status" -eq 0 ]
-  [[ "$output" == *"ip=Local"* ]]
+  [[ $output == *"ip=Local"* ]]
 }
 
 @test "login: process_logins updates state file after detecting logins" {
@@ -345,16 +360,16 @@ setup() {
   }
 
   date() {
-    if [[ "$1" == "-d" ]]; then
+    if [[ $1 == "-d" ]]; then
       shift
-      if [[ "$1" == +'%Y-%m-%d %H:%M:%S' ]]; then
+      if [[ $1 == +'%Y-%m-%d %H:%M:%S' ]]; then
         echo "2026-04-23 01:30:00"
       else
         echo "1713831000"
       fi
-    elif [[ "$1" == "+%s" ]]; then
+    elif [[ $1 == "+%s" ]]; then
       echo "1713830400"
-    elif [[ "$1" == +'%Y-%m-%d %H:%M:%S' ]]; then
+    elif [[ $1 == +'%Y-%m-%d %H:%M:%S' ]]; then
       echo "2026-04-23 01:30:00"
     else
       echo "1713831000"
@@ -379,7 +394,7 @@ setup() {
   }
 
   stat() {
-    if [[ "$1" == "-c" && "$2" == "%a" ]]; then
+    if [[ $1 == "-c" && $2 == "%a" ]]; then
       printf "600\n"
     else
       command stat "$@"
@@ -395,20 +410,20 @@ setup() {
 
 @test "login: main dies when config cache is missing" {
   command() {
-    if [[ "$1" == "-v" ]]; then return 0; fi
+    if [[ $1 == "-v" ]]; then return 0; fi
     builtin command "$@"
   }
 
   run main
   [ "$status" -eq 1 ]
-  [[ "$output" == *"Configuration cache not found"* ]]
+  [[ $output == *"Configuration cache not found"* ]]
 }
 
 @test "login: main calls check_deps with awk curl jq date last" {
   check_deps() { printf "DEPS_CALLED:%s\n" "$*"; }
 
   run main
-  [[ "$output" == *"DEPS_CALLED:awk curl jq date last"* ]]
+  [[ $output == *"DEPS_CALLED:awk curl jq date last"* ]]
 }
 
 @test "login: main fails when check_deps reports missing commands" {
@@ -416,29 +431,29 @@ setup() {
 
   run main
   [ "$status" -eq 1 ]
-  [[ "$output" == *"Missing required commands: last"* ]]
+  [[ $output == *"Missing required commands: last"* ]]
 }
 
 @test "login: get_available_notifiers returns login notifiers" {
   run get_available_notifiers "login-"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"telegram"* ]]
-  [[ "$output" == *"matrix"* ]]
-  [[ "$output" == *"ntfy"* ]]
+  [[ $output == *"telegram"* ]]
+  [[ $output == *"matrix"* ]]
+  [[ $output == *"ntfy"* ]]
 }
 
 @test "login: get_configured_notifiers returns telegram when BOT_TOKEN set" {
   BOT_TOKEN="000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
   run get_configured_notifiers
   [ "$status" -eq 0 ]
-  [[ "$output" == *"telegram"* ]]
+  [[ $output == *"telegram"* ]]
 }
 
 @test "login: get_configured_notifiers returns matrix when MATRIX_URL set" {
   MATRIX_URL="https://matrix.example.com"
   run get_configured_notifiers
   [ "$status" -eq 0 ]
-  [[ "$output" == *"matrix"* ]]
+  [[ $output == *"matrix"* ]]
 }
 
 @test "login: get_configured_notifiers returns ntfy when NTFY_URL set" {
@@ -446,7 +461,7 @@ setup() {
   NTFY_TOPIC="test-topic"
   run get_configured_notifiers
   [ "$status" -eq 0 ]
-  [[ "$output" == *"ntfy"* ]]
+  [[ $output == *"ntfy"* ]]
 }
 
 @test "login: get_configured_notifiers returns empty when nothing configured" {
@@ -470,11 +485,11 @@ setup() {
 
   run login_message_telegram
   [ "$status" -eq 0 ]
-  [[ "$output" == *"prod-server"* ]]
-  [[ "$output" == *"admin"* ]]
-  [[ "$output" == *"pts/0"* ]]
-  [[ "$output" == *"10.0.0.5"* ]]
-  [[ "$output" == *"SSH Login"* ]]
+  [[ $output == *"prod-server"* ]]
+  [[ $output == *"admin"* ]]
+  [[ $output == *"pts/0"* ]]
+  [[ $output == *"10.0.0.5"* ]]
+  [[ $output == *"SSH Login"* ]]
 }
 
 @test "login: login_message_matrix_plain contains expected fields" {
@@ -489,9 +504,9 @@ setup() {
 
   run login_message_matrix_plain
   [ "$status" -eq 0 ]
-  [[ "$output" == *"prod-server"* ]]
-  [[ "$output" == *"root"* ]]
-  [[ "$output" == *"Local"* ]]
+  [[ $output == *"prod-server"* ]]
+  [[ $output == *"root"* ]]
+  [[ $output == *"Local"* ]]
 }
 
 @test "login: login_message_matrix_html contains HTML markup" {
@@ -506,9 +521,9 @@ setup() {
 
   run login_message_matrix_html
   [ "$status" -eq 0 ]
-  [[ "$output" == *"<strong>"* ]]
-  [[ "$output" == *"<br>"* ]]
-  [[ "$output" == *"admin"* ]]
+  [[ $output == *"<strong>"* ]]
+  [[ $output == *"<br>"* ]]
+  [[ $output == *"admin"* ]]
 }
 
 @test "login: login_message_ntfy contains expected fields" {
@@ -523,8 +538,8 @@ setup() {
 
   run login_message_ntfy
   [ "$status" -eq 0 ]
-  [[ "$output" == *"deploy"* ]]
-  [[ "$output" == *"172.16.0.1"* ]]
+  [[ $output == *"deploy"* ]]
+  [[ $output == *"172.16.0.1"* ]]
 }
 
 @test "login: login_title_ntfy contains server name" {
@@ -534,8 +549,8 @@ setup() {
 
   run login_title_ntfy
   [ "$status" -eq 0 ]
-  [[ "$output" == *"SSH Login"* ]]
-  [[ "$output" == *"prod-01"* ]]
+  [[ $output == *"SSH Login"* ]]
+  [[ $output == *"prod-01"* ]]
 }
 
 @test "login: load_senders makes sender functions available" {
@@ -556,7 +571,7 @@ setup() {
 
 @test "login: check_deps succeeds when all commands exist" {
   command() {
-    if [[ "$1" == "-v" ]]; then return 0; fi
+    if [[ $1 == "-v" ]]; then return 0; fi
     builtin command "$@"
   }
   run check_deps awk curl jq date last
@@ -565,11 +580,11 @@ setup() {
 
 @test "login: check_deps fails when awk is missing" {
   command() {
-    if [[ "$1" == "-v" && "$2" == "awk" ]]; then return 1; fi
-    if [[ "$1" == "-v" ]]; then return 0; fi
+    if [[ $1 == "-v" && $2 == "awk" ]]; then return 1; fi
+    if [[ $1 == "-v" ]]; then return 0; fi
     builtin command "$@"
   }
   run check_deps awk curl jq date last
   [ "$status" -eq 1 ]
-  [[ "$output" == *"Missing required commands: awk"* ]]
+  [[ $output == *"Missing required commands: awk"* ]]
 }

@@ -67,23 +67,23 @@ setup() {
 @test "get_available_notifiers returns notifier names from messages directory" {
   run get_available_notifiers
   [ "$status" -eq 0 ]
-  [[ "$output" == *"telegram"* ]]
-  [[ "$output" == *"matrix"* ]]
-  [[ "$output" == *"ntfy"* ]]
+  [[ $output == *"telegram"* ]]
+  [[ $output == *"matrix"* ]]
+  [[ $output == *"ntfy"* ]]
 }
 
 @test "get_configured_notifiers returns telegram when BOT_TOKEN set" {
   BOT_TOKEN="000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
   run get_configured_notifiers
   [ "$status" -eq 0 ]
-  [[ "$output" == *"telegram"* ]]
+  [[ $output == *"telegram"* ]]
 }
 
 @test "get_configured_notifiers returns matrix when MATRIX_URL set" {
   MATRIX_URL="https://matrix.example.com"
   run get_configured_notifiers
   [ "$status" -eq 0 ]
-  [[ "$output" == *"matrix"* ]]
+  [[ $output == *"matrix"* ]]
 }
 
 @test "get_configured_notifiers returns ntfy when NTFY_URL set" {
@@ -91,7 +91,7 @@ setup() {
   NTFY_TOPIC="test-topic"
   run get_configured_notifiers
   [ "$status" -eq 0 ]
-  [[ "$output" == *"ntfy"* ]]
+  [[ $output == *"ntfy"* ]]
 }
 
 @test "get_configured_notifiers returns empty when no notifiers configured" {
@@ -115,7 +115,7 @@ setup() {
   BOT_TOKEN="000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
   run dispatch_notifications
   [ "$status" -ne 0 ]
-  [[ "$output" == *"not found"* ]] || [[ "$output" == *"Available:"* ]]
+  [[ $output == *"not found"* ]] || [[ $output == *"Available:"* ]]
 }
 
 @test "dispatch_notifications fails when notifier not configured" {
@@ -125,7 +125,7 @@ setup() {
   run dispatch_notifications
   set -u
   [ "$status" -ne 0 ]
-  [[ "$output" == *"not configured"* ]] || [[ "$output" == *"Configured:"* ]]
+  [[ $output == *"not configured"* ]] || [[ $output == *"Configured:"* ]]
 }
 
 @test "dispatch_notifications succeeds with valid configured notifier" {
@@ -133,7 +133,7 @@ setup() {
   BOT_TOKEN="000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
   CHAT_ID="-123456789"
   TOP_PROCS_FILE="${TEST_TMPDIR}/top_procs.txt"
-  echo "test" > "${TOP_PROCS_FILE}"
+  echo "test" >"${TOP_PROCS_FILE}"
 
   load_senders
   load_messages
@@ -148,18 +148,18 @@ setup() {
 @test "parse_args fails without threshold" {
   run parse_args --notifiers telegram
   [ "$status" -eq 1 ]
-  [[ "$output" == *"ERROR:"* ]]
+  [[ $output == *"ERROR:"* ]]
 }
 
 @test "parse_args fails with invalid threshold" {
   run parse_args --threshold abc
   [ "$status" -eq 1 ]
-  [[ "$output" == *"ERROR:"* ]]
+  [[ $output == *"ERROR:"* ]]
 }
 
 @test "check_deps succeeds when all commands exist" {
   command() {
-    if [[ "$1" == "-v" ]]; then return 0; fi
+    if [[ $1 == "-v" ]]; then return 0; fi
     builtin command "$@"
   }
   run check_deps
@@ -168,13 +168,13 @@ setup() {
 
 @test "check_deps fails when commands are missing" {
   command() {
-    if [[ "$1" == "-v" && "$2" == "awk" ]]; then return 1; fi
-    if [[ "$1" == "-v" ]]; then return 0; fi
+    if [[ $1 == "-v" && $2 == "awk" ]]; then return 1; fi
+    if [[ $1 == "-v" ]]; then return 0; fi
     builtin command "$@"
   }
   run check_deps awk curl jq ps file stat
   [ "$status" -eq 1 ]
-  [[ "$output" == *"Missing required commands: awk"* ]]
+  [[ $output == *"Missing required commands: awk"* ]]
 }
 
 @test "collect_disk_space parses df output" {
@@ -189,7 +189,7 @@ setup() {
 
 @test "collect_memory parses meminfo correctly" {
   grep() {
-    if [[ "$1" == "-E" && "$3" == "/proc/meminfo" ]]; then
+    if [[ $1 == "-E" && $3 == "/proc/meminfo" ]]; then
       echo "MemTotal: 8388608 kB"
       echo "MemFree: 4194304 kB"
       echo "Buffers: 1048576 kB"
@@ -209,7 +209,7 @@ setup() {
 
 @test "collect_failed_services gets failed systemctl units" {
   command() {
-    if [[ "$1" == "-v" && "$2" == "systemctl" ]]; then return 0; fi
+    if [[ $1 == "-v" && $2 == "systemctl" ]]; then return 0; fi
     builtin command "$@"
   }
   systemctl() {
@@ -223,16 +223,16 @@ setup() {
 @test "usage contains required sections" {
   run usage
   [ "$status" -eq 0 ]
-  [[ "$output" == *"Usage: high-load.sh"* ]]
-  [[ "$output" == *"Options:"* ]]
-  [[ "$output" == *"--threshold"* ]]
-  [[ "$output" == *"--notifiers"* ]]
-  [[ "$output" == *"Example:"* ]]
+  [[ $output == *"Usage: high-load.sh"* ]]
+  [[ $output == *"Options:"* ]]
+  [[ $output == *"--threshold"* ]]
+  [[ $output == *"--notifiers"* ]]
+  [[ $output == *"Example:"* ]]
 }
 
 @test "collect_psi sets PSI_AVAILABLE to 0 or 1" {
   collect_psi
-  [[ "$PSI_AVAILABLE" =~ ^[01]$ ]]
+  [[ $PSI_AVAILABLE =~ ^[01]$ ]]
 }
 
 @test "collect_psi initializes all PSI variables" {
@@ -286,7 +286,7 @@ setup() {
 
 @test "collect_failed_services returns empty when systemctl unavailable" {
   command() {
-    if [[ "$1" == "-v" && "$2" == "systemctl" ]]; then return 1; fi
+    if [[ $1 == "-v" && $2 == "systemctl" ]]; then return 1; fi
     builtin command "$@"
   }
   collect_failed_services
@@ -295,7 +295,7 @@ setup() {
 
 @test "collect_failed_services returns empty when no failures" {
   command() {
-    if [[ "$1" == "-v" && "$2" == "systemctl" ]]; then return 0; fi
+    if [[ $1 == "-v" && $2 == "systemctl" ]]; then return 0; fi
     builtin command "$@"
   }
   systemctl() { true; }
@@ -307,7 +307,7 @@ setup() {
   check_deps() { printf "DEPS_CALLED:%s\n" "$*"; }
 
   run main --threshold 5.0
-  [[ "$output" == *"DEPS_CALLED:awk curl jq ps file stat"* ]]
+  [[ $output == *"DEPS_CALLED:awk curl jq ps file stat"* ]]
 }
 
 @test "main fails when check_deps reports missing commands" {
@@ -315,11 +315,11 @@ setup() {
 
   run main --threshold 5.0
   [ "$status" -eq 1 ]
-  [[ "$output" == *"Missing required commands: jq"* ]]
+  [[ $output == *"Missing required commands: jq"* ]]
 }
 
 @test "main fails without --threshold" {
   run main
   [ "$status" -eq 1 ]
-  [[ "$output" == *"--threshold is required"* ]]
+  [[ $output == *"--threshold is required"* ]]
 }

@@ -5,10 +5,10 @@ setup() {
   source "$BATS_TEST_DIRNAME/../opt/monitoring/lib/validation.sh"
 
   stat() {
-    if [[ "$1" == "-c" && "$2" == "%u" ]]; then
+    if [[ $1 == "-c" && $2 == "%u" ]]; then
       echo "${EUID:-$(id -u)}"
-    elif [[ "$1" == "-c" && "$2" == "%a" ]]; then
-      if [[ "$3" == *"invalid_perms"* ]]; then
+    elif [[ $1 == "-c" && $2 == "%a" ]]; then
+      if [[ $3 == *"invalid_perms"* ]]; then
         echo "644"
       else
         echo "600"
@@ -19,7 +19,7 @@ setup() {
   }
 
   grep() {
-    if [[ "$1" == "-qP" ]]; then
+    if [[ $1 == "-qP" ]]; then
       command grep -qE "$2" "$3"
     else
       command grep "$@"
@@ -32,7 +32,7 @@ setup_file() {
   TEST_TMPDIR=$(mktemp -d)
 
   export VALID_CONFIG="${TEST_TMPDIR}/valid.conf"
-  cat > "${VALID_CONFIG}" <<'EOF'
+  cat >"${VALID_CONFIG}" <<'EOF'
 SERVER_NAME="test-server"
 BOT_TOKEN="000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 CHAT_ID="-123456789"
@@ -40,7 +40,7 @@ EOF
   chmod 600 "${VALID_CONFIG}"
 
   export MATRIX_CONFIG="${TEST_TMPDIR}/matrix.conf"
-  cat > "${MATRIX_CONFIG}" <<'EOF'
+  cat >"${MATRIX_CONFIG}" <<'EOF'
 SERVER_NAME="test-server"
 MATRIX_URL="https://matrix.example.com"
 MATRIX_ROOM_ID="!roomid:matrix.example.com"
@@ -49,7 +49,7 @@ EOF
   chmod 600 "${MATRIX_CONFIG}"
 
   export NTFY_CONFIG="${TEST_TMPDIR}/ntfy.conf"
-  cat > "${NTFY_CONFIG}" <<'EOF'
+  cat >"${NTFY_CONFIG}" <<'EOF'
 SERVER_NAME="test-server"
 NTFY_URL="https://ntfy.example.com"
 NTFY_TOPIC="test-topic"
@@ -58,7 +58,7 @@ EOF
   chmod 600 "${NTFY_CONFIG}"
 
   export ALL_CONFIG="${TEST_TMPDIR}/all.conf"
-  cat > "${ALL_CONFIG}" <<'EOF'
+  cat >"${ALL_CONFIG}" <<'EOF'
 SERVER_NAME="test-server"
 BOT_TOKEN="000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 CHAT_ID="-123456789"
@@ -72,13 +72,13 @@ EOF
   chmod 600 "${ALL_CONFIG}"
 
   export NO_NOTIFIER_CONFIG="${TEST_TMPDIR}/no_notifier.conf"
-  cat > "${NO_NOTIFIER_CONFIG}" <<'EOF'
+  cat >"${NO_NOTIFIER_CONFIG}" <<'EOF'
 SERVER_NAME="test-server"
 EOF
   chmod 600 "${NO_NOTIFIER_CONFIG}"
 
   export INVALID_PERMS_CONFIG="${TEST_TMPDIR}/invalid_perms.conf"
-  cat > "${INVALID_PERMS_CONFIG}" <<'EOF'
+  cat >"${INVALID_PERMS_CONFIG}" <<'EOF'
 SERVER_NAME="test-server"
 BOT_TOKEN="000000000:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 CHAT_ID="-123456789"
@@ -127,7 +127,7 @@ teardown_file() {
 
 @test "validate_bot_config fails without SERVER_NAME" {
   local empty_config="${TEST_TMPDIR}/empty.conf"
-  echo "" > "${empty_config}"
+  echo "" >"${empty_config}"
   chmod 600 "${empty_config}"
   run validate_bot_config "${empty_config}" "${TEST_TMPDIR}/cache"
   [ "$status" -eq 1 ]
@@ -496,18 +496,20 @@ teardown_file() {
   [ "$status" -eq 0 ]
   run validate_server_name "server name"
   [ "$status" -eq 0 ]
+  run validate_server_name "server+name"
+  [ "$status" -eq 0 ]
 }
 
 @test "validate_server_name rejects empty name" {
   run validate_server_name ""
   [ "$status" -eq 1 ]
-  [[ "$output" == *"SERVER_NAME is not set"* ]]
+  [[ $output == *"SERVER_NAME is not set"* ]]
 }
 
 @test "validate_server_name rejects CRLF injection" {
   run validate_server_name $'server\r\nX-Injected: true'
   [ "$status" -eq 1 ]
-  [[ "$output" == *"SERVER_NAME format is invalid"* ]]
+  [[ $output == *"SERVER_NAME format is invalid"* ]]
 }
 
 @test "validate_server_name rejects special chars" {
@@ -529,13 +531,13 @@ teardown_file() {
 @test "validate_ntfy_topic rejects empty topic" {
   run validate_ntfy_topic ""
   [ "$status" -eq 1 ]
-  [[ "$output" == *"NTFY_TOPIC is not set"* ]]
+  [[ $output == *"NTFY_TOPIC is not set"* ]]
 }
 
 @test "validate_ntfy_topic rejects CRLF injection" {
   run validate_ntfy_topic $'topic\r\nX-Attack: injected'
   [ "$status" -eq 1 ]
-  [[ "$output" == *"NTFY_TOPIC format is invalid"* ]]
+  [[ $output == *"NTFY_TOPIC format is invalid"* ]]
 }
 
 @test "validate_ntfy_topic rejects slashes and spaces" {
@@ -577,7 +579,7 @@ teardown_file() {
 
 @test "validate_secure_config rejects unsafe subshells" {
   local unsafe_config="${TEST_TMPDIR}/unsafe.conf"
-  cat > "${unsafe_config}" <<'EOF'
+  cat >"${unsafe_config}" <<'EOF'
 SERVER_NAME="test-server"
 BOT_TOKEN="$(rm -rf /)"
 EOF
@@ -588,7 +590,7 @@ EOF
 
 @test "validate_secure_config rejects unsafe backticks" {
   local unsafe_config="${TEST_TMPDIR}/unsafe2.conf"
-  cat > "${unsafe_config}" <<'EOF'
+  cat >"${unsafe_config}" <<'EOF'
 SERVER_NAME="test-server"
 BOT_TOKEN="`rm -rf /`"
 EOF

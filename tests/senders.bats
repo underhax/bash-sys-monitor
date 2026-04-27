@@ -43,8 +43,8 @@ setup() {
   curl() { echo "403"; }
   run tg_send_message "hello world"
   [ "$status" -eq 1 ]
-  [[ "$output" == *"ERROR [telegram]"* ]]
-  [[ "$output" == *"403"* ]]
+  [[ $output == *"ERROR [telegram]"* ]]
+  [[ $output == *"403"* ]]
 }
 
 @test "senders: tg_send_message uses provided token and chat_id" {
@@ -55,8 +55,8 @@ setup() {
   tg_send_message "test" "CUSTOM_TOKEN" "CUSTOM_CHAT"
   local args
   args=$(<"${CURL_ARGS_FILE}")
-  [[ "$args" == *"botCUSTOM_TOKEN"* ]]
-  [[ "$args" == *"chat_id=CUSTOM_CHAT"* ]]
+  [[ $args == *"botCUSTOM_TOKEN"* ]]
+  [[ $args == *"chat_id=CUSTOM_CHAT"* ]]
 }
 
 @test "senders: tg_send_file succeeds with valid file" {
@@ -68,27 +68,27 @@ setup() {
 @test "senders: tg_send_file fails when file not found" {
   run tg_send_file "/nonexistent/file.txt"
   [ "$status" -eq 1 ]
-  [[ "$output" == *"File not found"* ]]
+  [[ $output == *"File not found"* ]]
 }
 
 @test "senders: tg_send_file fails on HTTP error" {
   curl() { echo "500"; }
   run tg_send_file "${TEST_TMPDIR}/test_doc.txt"
   [ "$status" -eq 1 ]
-  [[ "$output" == *"ERROR [telegram]"* ]]
+  [[ $output == *"ERROR [telegram]"* ]]
 }
 
 @test "senders: mx_txn_id produces timestamp_random format" {
   run mx_txn_id
   [ "$status" -eq 0 ]
-  [[ "$output" =~ ^[0-9]+_[0-9]+$ ]]
+  [[ $output =~ ^[0-9]+_[0-9]+$ ]]
 }
 
 @test "senders: mx_txn_id generates unique values" {
   local id1 id2
   id1=$(mx_txn_id)
   id2=$(mx_txn_id)
-  [[ "$id1" != "$id2" ]]
+  [[ $id1 != "$id2" ]]
 }
 
 @test "senders: mx_send_message succeeds on HTTP 200" {
@@ -101,7 +101,7 @@ setup() {
   curl() { echo "401"; }
   run mx_send_message "plain text" "<b>html</b>"
   [ "$status" -eq 1 ]
-  [[ "$output" == *"ERROR [matrix]"* ]]
+  [[ $output == *"ERROR [matrix]"* ]]
 }
 
 @test "senders: mx_send_message uses provided credentials" {
@@ -112,35 +112,35 @@ setup() {
   mx_send_message "text" "html" "https://custom.matrix.org" "!custom:room" "custom_token"
   local args
   args=$(<"${CURL_ARGS_FILE}")
-  [[ "$args" == *"custom.matrix.org"* ]]
-  [[ "$args" == *"Bearer custom_token"* ]]
+  [[ $args == *"custom.matrix.org"* ]]
+  [[ $args == *"Bearer custom_token"* ]]
 }
 
 @test "senders: mx_upload_file fails when file not found" {
   run mx_upload_file "/nonexistent/file.txt"
   [ "$status" -eq 1 ]
-  [[ "$output" == *"File not found"* ]]
+  [[ $output == *"File not found"* ]]
 }
 
 @test "senders: mx_upload_file returns content_uri on success" {
   curl() { echo '{"content_uri": "mxc://example.com/abc123"}'; }
   run mx_upload_file "${TEST_TMPDIR}/test_doc.txt"
   [ "$status" -eq 0 ]
-  [[ "$output" == *"mxc://example.com/abc123"* ]]
+  [[ $output == *"mxc://example.com/abc123"* ]]
 }
 
 @test "senders: mx_upload_file fails on missing content_uri" {
   curl() { echo '{"error": "upload failed"}'; }
   run mx_upload_file "${TEST_TMPDIR}/test_doc.txt"
   [ "$status" -eq 1 ]
-  [[ "$output" == *"missing content_uri"* ]]
+  [[ $output == *"missing content_uri"* ]]
 }
 
 @test "senders: mx_upload_file fails on curl error" {
   curl() { return 1; }
   run mx_upload_file "${TEST_TMPDIR}/test_doc.txt"
   [ "$status" -eq 1 ]
-  [[ "$output" == *"curl failed"* ]]
+  [[ $output == *"curl failed"* ]]
 }
 
 @test "senders: mx_send_file fails when file not found" {
@@ -156,11 +156,11 @@ setup() {
     echo "${call_num}" >>"${CURL_CALL_FILE}"
     case ${call_num} in
     1) echo '{"content_uri": "mxc://example.com/abc123"}' ;; # upload
-    2) echo "200" ;;                                          # send
+    2) echo "200" ;;                                         # send
     esac
   }
   stat() {
-    if [[ "$1" == "-c%s" ]]; then
+    if [[ $1 == "-c%s" ]]; then
       echo "1024"
     else
       command stat "$@"
@@ -180,8 +180,8 @@ setup() {
   curl() { echo "429"; }
   run ntfy_send "test message"
   [ "$status" -eq 1 ]
-  [[ "$output" == *"ERROR [ntfy]"* ]]
-  [[ "$output" == *"429"* ]]
+  [[ $output == *"ERROR [ntfy]"* ]]
+  [[ $output == *"429"* ]]
 }
 
 @test "senders: ntfy_send includes auth header when token provided" {
@@ -192,7 +192,7 @@ setup() {
   ntfy_send "msg" "https://ntfy.sh" "topic" "tk_secret123"
   local args
   args=$(<"${CURL_ARGS_FILE}")
-  [[ "$args" == *"Bearer tk_secret123"* ]]
+  [[ $args == *"Bearer tk_secret123"* ]]
 }
 
 @test "senders: ntfy_send includes title header when provided" {
@@ -203,7 +203,7 @@ setup() {
   ntfy_send "msg" "https://ntfy.sh" "topic" "tk_secret123" "Alert Title"
   local args
   args=$(<"${CURL_ARGS_FILE}")
-  [[ "$args" == *"Title: Alert Title"* ]]
+  [[ $args == *"Title: Alert Title"* ]]
 }
 
 @test "senders: ntfy_send omits auth header without token" {
@@ -217,13 +217,13 @@ setup() {
   set -u
   local args
   args=$(<"${CURL_ARGS_FILE}")
-  [[ "$args" != *"Bearer"* ]]
+  [[ $args != *"Bearer"* ]]
 }
 
 @test "senders: ntfy_send_file fails when file not found" {
   run ntfy_send_file "/nonexistent/file.txt"
   [ "$status" -eq 1 ]
-  [[ "$output" == *"File not found"* ]]
+  [[ $output == *"File not found"* ]]
 }
 
 @test "senders: ntfy_send_file succeeds with valid file" {
@@ -236,7 +236,7 @@ setup() {
   curl() { echo "500"; }
   run ntfy_send_file "${TEST_TMPDIR}/test_doc.txt"
   [ "$status" -eq 1 ]
-  [[ "$output" == *"ERROR [ntfy]"* ]]
+  [[ $output == *"ERROR [ntfy]"* ]]
 }
 
 @test "senders: ntfy_send_file includes filename header" {
@@ -247,5 +247,5 @@ setup() {
   ntfy_send_file "${TEST_TMPDIR}/test_doc.txt" "https://ntfy.sh" "topic" "" ""
   local args
   args=$(<"${CURL_ARGS_FILE}")
-  [[ "$args" == *"Filename: test_doc.txt"* ]]
+  [[ $args == *"Filename: test_doc.txt"* ]]
 }

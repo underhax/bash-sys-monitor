@@ -5,4 +5,5 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
+EnvironmentFile=/run/bash-sys-monitor/config
 ExecStart=/opt/monitoring/login.sh
